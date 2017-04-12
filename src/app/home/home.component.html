@@ -1,37 +1,21 @@
 <div>
-  <h1 x-large class="sample-content">Your Content Here</h1>
-
-  <hr>
-
-  <div>
-    For hot module reloading run
-    <pre>npm run start:hmr</pre>
+  <h1>Spot the difference</h1>
+  <div *ngIf="!gameOver">
+    <h3>Round {{round}} - image set {{imageSet}} -
+      <timer [timeout]="timeAllowed" (timesUp)="wrongAnswer($event)"></timer>
+    </h3>
+    <h3>Your score: {{totalScore}}</h3>
+    <image-grid [imageSet]="imageSet" (rightAnswer)="rightAnswer($event)" (wrongAnswer)="wrongAnswer($event)"></image-grid>
   </div>
-
-  <hr>
-
-  <div>
-    <h4>Local State</h4>
-
-    <form (ngSubmit)="submitState(localState.value)" autocomplete="off">
-
-      <input
-        [value]="localState.value"
-        (input)="localState.value = $event.target.value"
-        placeholder="Submit Local State to App State"
-        autofocus>
-
-      <button>Submit Value</button>
-    </form>
-    <!--
-        <input type="text" [value]="localState.value" (input)="localState.value = $event.target.value" autofocus>
-        Rather than wiring up two-way data-binding ourselves with [value] and (input)
-        we can use Angular's [(ngModel)] syntax
-        <input type="text" name="textInput" [(ngModel)]="localState.value" autofocus>
-      -->
-
-    <pre>this.localState = {{ localState | json }}</pre>
-
+  <div *ngIf="gameOver">
+    <h3>Game over!</h3>
+    <h3>Your score was {{totalScore}}.</h3>
+    <h3 *ngIf="isHighScore">Congratulations! That's a new high score!</h3>
+    <h4 *ngIf="!isHighScore">The high score is {{highScore}}.</h4>
+    <div style="margin-top: 1rem;">
+      <button (click)="newGame($event)" type="button">
+      Click here to start a new game.
+    </button>
+    </div>
   </div>
-
 </div>

@@ -1,0 +1,14 @@
+<!--<h5>Image set {{imageSet}}</h5>-->
+<h5>Correct image is {{correctImage}}</h5>
+<table style="border: 1px solid black; min-width: 800px; max-width:1200px;">
+  <tbody>
+    <tr style="height: 400px; min-height: 400px; max-height: 600px;">
+      <td><img (click)="select($event)" [src]="urls[0]"></td>
+      <td><img (click)="select($event)" [src]="urls[1]"></td>
+    </tr>
+    <tr style="height: 400px; min-height: 400px; max-height: 600px;">
+      <td><img (click)="select($event)" [src]="urls[2]"></td>
+      <td><img (click)="select($event)" [src]="urls[3]"></td>
+    </tr>    
+  </tbody>
+</table>

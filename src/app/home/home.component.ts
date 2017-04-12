@@ -1,43 +1,83 @@
 import {
   Component,
-  OnInit
+  Output,
+  OnInit,
+  ViewChild
 } from '@angular/core';
-
+import { TimerComponent } from '../timer/timer.component';
 import { AppState } from '../app.service';
-import { Title } from './title';
-import { XLargeDirective } from './x-large';
 
 @Component({
-  // The selector is what angular internally uses
-  // for `document.querySelectorAll(selector)` in our index.html
-  // where, in this case, selector is the string 'home'
-  selector: 'home',  // <home></home>
-  // We need to tell Angular's Dependency Injection which providers are in our app.
-  providers: [
-    Title
-  ],
-  // Our list of styles in our component. We may add more to compose many styles together
-  styleUrls: [ './home.component.css' ],
-  // Every Angular template is first compiled by the browser before Angular runs it's compiler
+  selector: 'home',
+  styleUrls: ['./home.component.css'],
   templateUrl: './home.component.html'
 })
 export class HomeComponent implements OnInit {
-  // Set our default values
-  public localState = { value: '' };
-  // TypeScript public modifiers
-  constructor(
-    public appState: AppState,
-    public title: Title
-  ) {}
 
-  public ngOnInit() {
-    console.log('hello `Home` component');
-    // this.title.getData().subscribe(data => this.data = data);
+  public get timeAllowed(): number { return 30; }
+  public get highScore(): number { return this._highScore; }
+  public get isHighScore(): boolean { return this.totalScore > this.highScore; }
+  public get totalScore(): number { return this._totalScore; }
+  public get round(): number { return this._round + 1; }
+  public get gameOver(): boolean { return this._round >= this._totalRounds }
+
+  @Output() public get imageSet(): number {
+    return this._imagesChosen[this._round];
+  }
+  @ViewChild(TimerComponent) public timer: TimerComponent;
+
+
+  private readonly _totalRounds = 5;
+  private readonly _numberOfImageSets = 10;
+
+  private _totalScore = 0;
+  private _highScore = 0;
+  
+  private _round = 0;
+  private readonly _imagesChosen: number[] = [];
+
+  public ngOnInit(): void {
+    // These are constants but it protects against an inevitable infinite do while
+    if (this._totalRounds > this._numberOfImageSets) {
+      throw new Error(`There are more rounds (${this._totalRounds})` +
+        ` than image sets available (${this._numberOfImageSets}).  This is not allowed.`);
+    }
+    let randomCeiling = this._numberOfImageSets;
+    let imagesChosen = this._imagesChosen;
+    let index: number = -1;
+    for (let i = 0; i < this._totalRounds; ++i) {
+      do {
+        index = Math.floor(Math.random() * randomCeiling)
+      }
+      while (imagesChosen.indexOf(index) >= 0)
+      imagesChosen.push(index);
+    }
   }
 
-  public submitState(value: string) {
-    console.log('submitState', value);
-    this.appState.set('value', value);
-    this.localState.value = '';
+  public rightAnswer(): void {
+    this.newRound(Math.floor(this.timeAllowed - this.timer.elapsed));
   }
+  public wrongAnswer(): void {
+    this.newRound(0);
+  }
+
+  public newGame(): void {
+    this._round = 0;
+    this._totalScore = 0;
+    this.timer.start();
+  }
+
+  private newRound(score: number): void {
+    this._totalScore += score;
+    this._round += 1;
+    if (!this.gameOver) {
+      this.timer.start();
+    }
+    else if (this._totalScore > this._highScore) {
+      this._highScore = this._totalScore;
+    }
+  }
+
+  
+
 }
