@@ -16,7 +16,7 @@ export class HomeComponent implements OnInit {
 
   public get timeAllowed(): number { return 30; }
   public get highScore(): number { return this._highScore; }
-  public get isHighScore(): boolean { return this.totalScore > this.highScore; }
+  public get isHighScore(): boolean { return this.totalScore >= this.highScore; }
   public get totalScore(): number { return this._totalScore; }
   public get round(): number { return this._round + 1; }
   public get gameOver(): boolean { return this._round >= this._totalRounds }
@@ -62,6 +62,9 @@ export class HomeComponent implements OnInit {
   }
 
   public newGame(): void {
+    if (this._totalScore > this._highScore) {
+      this._highScore = this._totalScore;
+    }
     this._round = 0;
     this._totalScore = 0;
     this.timer.start();
@@ -73,9 +76,7 @@ export class HomeComponent implements OnInit {
     if (!this.gameOver) {
       this.timer.start();
     }
-    else if (this._totalScore > this._highScore) {
-      this._highScore = this._totalScore;
-    }
+    
   }
 
   
